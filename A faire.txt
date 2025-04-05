@@ -1,0 +1,13 @@
+########### Les Roles ##############
+l'admin qui gère tout
+les president ou manager pour chaque communautées 
+les membres ou utilisateur des différentes communautées
+la communauté de communication qui se charge de la maintenance et les ajouts sur le site 
+
+
+
+########### Les Communautées ##############
+
+# les crud des communautées => pour l'admin 
+# afficher les communautées => pour les utilisateur 
+# assigner un president a une communauté
