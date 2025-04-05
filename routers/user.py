@@ -3,6 +3,8 @@ from fastapi import Depends, APIRouter, HTTPException, Request
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from starlette import status
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from passlib.context import CryptContext
 
 from database import SessionLocal
 from models import Community, User
@@ -16,6 +18,10 @@ router = APIRouter(
     prefix="/user",
     tags=["user"],
 )
+
+
+bcrypt_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+oauth2_bearer = OAuth2PasswordBearer(tokenUrl="auth/token")
 
 def get_db():
     """Crée et gère une session de base de données."""
@@ -61,6 +67,26 @@ async def get_one_user(user_id: int, db: DbDependency, admin: AdminDependency):
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
     return {"user": user}
+
+# créer un utilisateur
+@router.post("/create-user", status_code=status.HTTP_201_CREATED)
+async def create_user(user: UserRequest, db: DbDependency, admin: Annotated[dict, Depends(get_current_admin)]):
+    """Crée un nouvel utilisateur."""
+    new_user = User(
+        username = user.username,
+        firstname = user.firstname if user.firstname else None,
+        lastname = user.lastname if user.lastname else None,
+        email = user.email,
+        hashed_password = bcrypt_context.hash(user.password),  # Hash the password here 
+        age = user.age if user.age else None,
+        city = user.city if user.city else None,
+        country = user.country if user.country else None,
+        phone = user.phone if user.phone else None,
+        address = user.address if user.address else None,
+    )
+    db.add(new_user)
+    db.commit()
+    return {"message": "User created successfully"}
 
 # modifier un utilisateur
 @router.put("/{user_id}")

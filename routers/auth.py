@@ -154,24 +154,6 @@ async def get_users(db: DbDependency):
     users = db.query(User).all()
     return users
 
-@router.post("/create-user", status_code=status.HTTP_201_CREATED)
-async def create_user(user: CreateUserRequest, db: DbDependency, admin: Annotated[dict, Depends(get_current_admin)]):
-    """Crée un nouvel utilisateur."""
-    new_user = User(
-        username = user.username,
-        firstname = user.firstname if user.firstname else None,
-        lastname = user.lastname if user.lastname else None,
-        email = user.email,
-        hashed_password = bcrypt_context.hash(user.password),  # Hash the password here 
-        age = user.age if user.age else None,
-        city = user.city if user.city else None,
-        country = user.country if user.country else None,
-        phone = user.phone if user.phone else None,
-        address = user.address if user.address else None,
-    )
-    db.add(new_user)
-    db.commit()
-    return {"message": "User created successfully"}
 
 @router.post("/token", response_model=Token, status_code=status.HTTP_200_OK)
 async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: DbDependency):
