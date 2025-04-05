@@ -41,6 +41,7 @@ class CommunityRequest(BaseModel):
     name: str
     description: str | None = None
     area: str | None = None
+    
 
 # recuperer une communauté par son id
 @router.get("/{community_id}")
